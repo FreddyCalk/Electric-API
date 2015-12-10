@@ -19,6 +19,7 @@ MongoClient.connect(mongoURL, function (error, db){
 						res.render('thanks', {})
 					}else{
 						var rand = Math.floor(Math.random()*result.length);
+
 						res.render('index', { photo: result[rand] })
 					}
 				});
@@ -73,7 +74,7 @@ router.post('/add', function (req,res,next){
 	res.redirect('/');
 })
 
-router.post('*', function (req, res, next){
+router.post('/favorites', function (req, res, next){
 	if(req.url == '/favorites'){
 		var page = 'favorites';
 	}else if(req.url == '/losers'){
@@ -84,7 +85,7 @@ router.post('*', function (req, res, next){
 	MongoClient.connect(mongoURL, function (error, db){
 		db.collection('cars').find({src: req.body.src}).toArray(function (error, result){
 			var updateVotes = function (db, votes, callback){
-				if(page =='favorites'){var newVotes = votes+1;}
+				if(page =='favorites'){var newVotes = votes + 1;}
 				else if(page == 'losers'){var newVotes = votes;}
 
 				db.collection('cars').updateOne(
@@ -93,12 +94,11 @@ router.post('*', function (req, res, next){
 						$set: {"totalVotes": newVotes},
 						$currentDate: {"lastModified":true}
 					}, function (err, result){
-						db.close();
+						callback()
 					})
 			};
 			MongoClient.connect(mongoURL, function (error, db){
-				console.log(result)
-				updateVotes(db,result[0].totalVotes, function(){});
+				updateVotes(db,result[0].totalVotes, function(){db.close()});
 			})
 		})
 		MongoClient.connect(mongoURL, function (error, db){
@@ -114,7 +114,7 @@ router.post('*', function (req, res, next){
 		})	
 
 	})
-	setTimeout(res.redirect('/'),0)
+	res.redirect('/')
 })
 
 

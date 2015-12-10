@@ -3,8 +3,11 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var photoSchema = new Schema({
-	image: String,
+	year: Number,
+	make: String,
+	model: String,
+	src: String,
 	totalVotes: Number
 })
 
-module.exports = mongoose.model('photos', photoSchema)
+module.exports = mongoose.model('cars', photoSchema)

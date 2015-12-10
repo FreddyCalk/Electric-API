@@ -46,19 +46,23 @@ img{
 	width:800px;
 	text-align: center;
 }
+
 #content-container h3{
 	padding-top:40px;
 }
+
 .vote-button{
 	display:inline;
 }
-#addition-form #carName, #addition-form #imageSrc{
+
+#addition-form .carName, #addition-form #imageSrc{
 	width:80%;
 	height:50px;
 	margin:20px;
 	padding:10px;
 	border-radius:10px;
 }
+
 #addition-form .btn{
 	width:80%;
 	margin-top: 20px;
