@@ -1,19 +1,23 @@
 var express = require('express');
 var router = express.Router();
-var MongoClient = require('mongodb').MongoClient;
+var mongoose = require('mongoose');
+var Cars = require('../models/photos');
+var Users = require('../models/users');
 
 var mongoURL = 'mongodb://localhost:27017/cardb';
+mongoose.connect(mongoURL)
+var db;
 
-MongoClient.connect(mongoURL, function (error, db){
+
 /* GET home page. */
 	router.get('/', function (req, res, next) {
 		var currIP = req.ip;
-			db.collection('users').find({ip:currIP}).toArray(function (error, userResult){
+			Users.find({ip:currIP}, function (error, userResult){
 				var photosVoted = [];
 				for(i=0;i<userResult.length;i++){
 					photosVoted.push(userResult[i].src);
 				}
-				db.collection('cars').find({src : {$nin:photosVoted}}).toArray(function (error, result){
+				Cars.find({src : {$nin:photosVoted}},function (error, result){
 					if(result.length == 0){
 						// redirect to the thanks page
 						res.render('thanks', {})
@@ -34,7 +38,7 @@ MongoClient.connect(mongoURL, function (error, db){
 
 	})
 	router.get('/favorites', function (req, res, next){
-			db.collection('users').find({vote: 'favorites'}).toArray(function (error, result){
+			Users.find({vote: 'favorites'}, function (error, result){
 				res.render('favorites',{title: "Standings", photos : result})
 			})
 		// 1. get all the photos
@@ -42,7 +46,7 @@ MongoClient.connect(mongoURL, function (error, db){
 		// 3. res.render the standings view and pass it the sorted photo array.
 	})
 	router.get('/list', function (req, res, next){
-			db.collection('cars').find().toArray(function (error, result){
+			Cars.find(function (error, result){
 				result.sort(function (p1, p2){
 					return (p2.totalVotes - p1.totalVotes);
 				})
@@ -50,7 +54,7 @@ MongoClient.connect(mongoURL, function (error, db){
 			})
 	})
 	router.get('/losers', function (req, res, next){
-			db.collection('users').find({vote: 'pass'}).toArray(function (error, result){
+			Users.find({vote: 'pass'},function (error, result){
 				res.render('losers',{photos : result});
 			})
 	})
@@ -58,19 +62,15 @@ MongoClient.connect(mongoURL, function (error, db){
 	router.get('/add', function (req, res, next){
 		res.render('add',{});
 	})
-})
 
 router.post('/add', function (req,res,next){
-	MongoClient.connect(mongoURL, function (error, db){
-		db.collection('cars').insertOne({
+		Cars.insertOne({
 			year: req.body.year,
 			make: req.body.make,
 			model: req.body.model,
 			src: req.body.src,
 			totalVotes: 0
 		})
-		db.close()
-	})
 	res.redirect('/');
 })
 
@@ -82,13 +82,12 @@ router.post('/favorites', function (req, res, next){
 	}else{
 		res.redirect('/');
 	}
-	MongoClient.connect(mongoURL, function (error, db){
-		db.collection('cars').find({src: req.body.src}).toArray(function (error, result){
+		Cars.find({src: req.body.src},function (error, result){
 			var updateVotes = function (db, votes, callback){
 				if(page =='favorites'){var newVotes = votes + 1;}
 				else if(page == 'losers'){var newVotes = votes;}
 
-				db.collection('cars').updateOne(
+				Cars.updateOne(
 					{ "src" : req.body.src },
 					{
 						$set: {"totalVotes": newVotes},
@@ -97,12 +96,9 @@ router.post('/favorites', function (req, res, next){
 						callback()
 					})
 			};
-			MongoClient.connect(mongoURL, function (error, db){
-				updateVotes(db,result[0].totalVotes, function(){db.close()});
-			})
+				updateVotes(db,result[0].totalVotes, function(){});
 		})
-		MongoClient.connect(mongoURL, function (error, db){
-			db.collection('users').insertOne({
+			Users.insertOne({
 				ip: req.ip,
 				vote: req.body.vote,
 				year: req.body.year,
@@ -110,10 +106,7 @@ router.post('/favorites', function (req, res, next){
 				model: req.body.model,
 				src: req.body.src
 			})
-			db.close();
-		})	
 
-	})
 	res.redirect('/')
 })
 
