@@ -6,7 +6,7 @@ var Users = require('../models/users');
 
 var mongoURL = 'mongodb://localhost:27017/cardb';
 mongoose.connect(mongoURL);
-var db;
+var db = mongoose.createConnection(mongoURL);
 
 /*Get home page*/
 router.get('/photos/get', function (req, res, next) {

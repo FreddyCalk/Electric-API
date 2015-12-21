@@ -39,11 +39,12 @@ img{
 
 }
 #content-container{
-	background-color: #cf5300;
+	background-color: #004080;
+	color:white;
 	border-radius: 20px;
 	margin:auto;
 	padding-bottom: 30px;
-	width:800px;
+	width:1000px;
 	text-align: center;
 }
 

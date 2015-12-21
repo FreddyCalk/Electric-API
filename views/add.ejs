@@ -7,9 +7,11 @@
 <div id="content-container">
 	<p> Add Your Own Car </p>
 	<form id="addition-form" action="./add" method="post">
-		<input class="carName" type="text" placeholder="Car Year..." name = "year">
-		<input class="carName" type="text" placeholder="Car Name..." name = "name">
+		<input class="carName" type="text" placeholder="Car Year" name = "year">
+		<input class="carName" type="text" placeholder="Car Make" name = "make">
+		<input class="carName" type="text" placeholder="Car Model" name = "model">
 		<input id="imageSrc" type="text" placeholder="Image URL" name = "src">
+		<input type="hidden" name = "totalVotes" value="0">
 		<input class="btn btn-primary" type="submit">
 	</form>
 

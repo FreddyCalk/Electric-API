@@ -11,22 +11,22 @@
 	<img src="<%= photo.src%>">
 	<div class="car-name"><%=photo.year%> <%= photo.make %> <%=photo.model%></div>
 	<div id="button-container">
-	<form class = "vote-button" action="/favorites" method="post">
-		<input type="hidden" name = "vote" value="<%='favorites'%>">
-		<input type="hidden" name = "year" value="<%=photo.year%>">
-		<input type="hidden" name = "make" value="<%=photo.make%>">
-		<input type="hidden" name = "model" value="<%=photo.model%>">
-		<input type="hidden" name = "src" value="<%=photo.src%>">
-		<input type="submit" class="btn btn-success" value="Cool!">
-	</form>
-	<form class="vote-button" action="/favorites" method="post">
-		<input type="hidden" name = "vote" value="<%='pass'%>">
-		<input type="hidden" name = "year" value="<%=photo.year%>">
-		<input type="hidden" name = "make" value="<%=photo.make%>">
-		<input type="hidden" name = "model" value="<%=photo.model%>">
-		<input type="hidden" name = "src" value="<%=photo.src%>">
-		<input type="submit" class="btn btn-danger" value="Lame!">
-	</form>
+		<form class = "vote-button" action="/favorites" method="post">
+			<input type="hidden" name = "vote" value="<%='favorites'%>">
+			<input type="hidden" name = "year" value="<%=photo.year%>">
+			<input type="hidden" name = "make" value="<%=photo.make%>">
+			<input type="hidden" name = "model" value="<%=photo.model%>">
+			<input type="hidden" name = "src" value="<%=photo.src%>">
+			<input type="submit" class="btn btn-success" value="Cool!">
+		</form>
+		<form class="vote-button" action="/losers" method="post">
+			<input type="hidden" name = "vote" value="<%='pass'%>">
+			<input type="hidden" name = "year" value="<%=photo.year%>">
+			<input type="hidden" name = "make" value="<%=photo.make%>">
+			<input type="hidden" name = "model" value="<%=photo.model%>">
+			<input type="hidden" name = "src" value="<%=photo.src%>">
+			<input type="submit" class="btn btn-danger" value="Lame!">
+		</form>
 	</div>
 </div>
 	<footer>

@@ -3,9 +3,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
-	ip: String,
 	vote: String,
-	src: String
+	year: String,
+	make: String,
+	model: String,
+	ip: String,
+	src: String,
+	vote: String
+	
 })
 
 module.exports = mongoose.model('users', userSchema)

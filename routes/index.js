@@ -4,46 +4,37 @@ var mongoose = require('mongoose');
 var Cars = require('../models/photos');
 var Users = require('../models/users');
 
-var mongoURL = 'mongodb://localhost:27017/cardb';
-mongoose.connect(mongoURL)
-var db;
+var mongoURL = process.env.MONGOLAB_URI || process.eng.MONGOHQ_URL || 'mongodb://localhost:27017/cardb';
+
+var db = mongoose.createConnection(mongoURL);
 
 
 /* GET home page. */
 	router.get('/', function (req, res, next) {
 		var currIP = req.ip;
+		var photosVoted = []
 			Users.find({ip:currIP}, function (error, userResult){
-				var photosVoted = [];
 				for(i=0;i<userResult.length;i++){
-					photosVoted.push(userResult[i].src);
+					photosVoted.push(userResult[i].src)
 				}
-				Cars.find({src : {$nin:photosVoted}},function (error, result){
+				console.log(photosVoted)
+				Cars.find({src : {$nin : photosVoted}}, function (error, result){
+					console.log(result)
 					if(result.length == 0){
-						// redirect to the thanks page
 						res.render('thanks', {})
 					}else{
-						var rand = Math.floor(Math.random()*result.length);
+						var rand = Math.floor(Math.random() * result.length);
 
 						res.render('index', { photo: result[rand] })
 					}
 				});
 			});
-		// Index page should load random picture/item
-		// 1. Get all pictures from the MongoDB
-		// 2. Get the current user from MongoDB via req.ip;
-		// 3. Find which photos the current user has NOT voted on
-		// 4. Load all of those photos into an array.
-		// 5. Choose a random image from the array, and set it to a var.
-		// 6. res.render() the index view and send it the photo.
 
 	})
 	router.get('/favorites', function (req, res, next){
 			Users.find({vote: 'favorites'}, function (error, result){
-				res.render('favorites',{title: "Standings", photos : result})
+				res.render('favorites',{ photos : result})
 			})
-		// 1. get all the photos
-		// 2. sort them by most likes
-		// 3. res.render the standings view and pass it the sorted photo array.
 	})
 	router.get('/list', function (req, res, next){
 			Cars.find(function (error, result){
@@ -64,17 +55,18 @@ var db;
 	})
 
 router.post('/add', function (req,res,next){
-		Cars.insertOne({
+		var newCar = new Cars({ 
 			year: req.body.year,
 			make: req.body.make,
 			model: req.body.model,
 			src: req.body.src,
 			totalVotes: 0
 		})
+		newCar.save(function (err, data){})
 	res.redirect('/');
 })
 
-router.post('/favorites', function (req, res, next){
+router.post('*', function (req, res, next){
 	if(req.url == '/favorites'){
 		var page = 'favorites';
 	}else if(req.url == '/losers'){
@@ -84,21 +76,23 @@ router.post('/favorites', function (req, res, next){
 	}
 		Cars.find({src: req.body.src},function (error, result){
 			var updateVotes = function (db, votes, callback){
-				if(page =='favorites'){var newVotes = votes + 1;}
-				else if(page == 'losers'){var newVotes = votes;}
+				if(page === 'favorites'){
+					var newVotes = votes + 1;
+				}else if(page === 'losers'){
+					var newVotes = votes;
+				}
 
-				Cars.updateOne(
+				Cars.update(
 					{ "src" : req.body.src },
 					{
-						$set: {"totalVotes": newVotes},
-						$currentDate: {"lastModified":true}
+						$set: {"totalVotes": newVotes}
 					}, function (err, result){
 						callback()
 					})
 			};
 				updateVotes(db,result[0].totalVotes, function(){});
 		})
-			Users.insertOne({
+			var newCar = new Users({
 				ip: req.ip,
 				vote: req.body.vote,
 				year: req.body.year,
@@ -106,12 +100,10 @@ router.post('/favorites', function (req, res, next){
 				model: req.body.model,
 				src: req.body.src
 			})
+			newCar.save(function (err, data){
+			})
 
 	res.redirect('/')
 })
-
-
-
-
 
 module.exports = router;
